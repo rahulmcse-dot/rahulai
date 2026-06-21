@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to AI</title>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         * {
             margin: 0;
@@ -20,6 +22,7 @@
             font-family: "Inter", sans-serif;
             background: linear-gradient(135deg, #0f172a, #1e293b, #3b82f6);
             overflow: hidden;
+            flex-direction: column;
         }
 
         .container {
@@ -71,8 +74,39 @@
             right: -100px;
             background: rgba(168, 85, 247, 0.4);
         }
+
+        /* NEW UI */
+        .form-box {
+            margin-top: 25px;
+        }
+
+        input {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: #3b82f6;
+            color: white;
+        }
+
+        #output {
+            margin-top: 20px;
+            color: white;
+            text-align: left;
+            max-height: 200px;
+            overflow-y: auto;
+        }
     </style>
 </head>
+
 <body>
 
     <div class="glow one"></div>
@@ -84,7 +118,76 @@
             Explore the future of AI-powered development with a modern,
             responsive, and elegant web experience.
         </p>
+
+        <!-- NEW FORM -->
+        <div class="form-box">
+            <input id="name" placeholder="Your name">
+            <input id="message" placeholder="Message">
+            <button onclick="saveData()">Send</button>
+        </div>
+
+        <div id="output"></div>
     </div>
+
+<script>
+/* -----------------------------
+   SUPABASE CONNECTION
+------------------------------*/
+const SUPABASE_URL = "https://ykcbdmdqzeonodemcavc.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_yhzQvFqLaMw861azeWeBSQ_iDUy70Jg";
+
+const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+);
+
+/* -----------------------------
+   SAVE DATA TO SUPABASE
+------------------------------*/
+async function saveData() {
+    const name = document.getElementById("name").value;
+    const message = document.getElementById("message").value;
+
+    const { error } = await supabaseClient
+        .from("messages")
+        .insert([{ name, message }]);
+
+    if (error) {
+        alert("Error: " + error.message);
+        return;
+    }
+
+    document.getElementById("name").value = "";
+    document.getElementById("message").value = "";
+
+    loadData();
+}
+
+/* -----------------------------
+   LOAD DATA FROM SUPABASE
+------------------------------*/
+async function loadData() {
+    const { data, error } = await supabaseClient
+        .from("messages")
+        .select("*")
+        .order("id", { ascending: false });
+
+    if (error) {
+        console.log(error);
+        return;
+    }
+
+    let html = "<h3>Messages</h3>";
+
+    data.forEach(item => {
+        html += `<p><b>${item.name}</b>: ${item.message}</p>`;
+    });
+
+    document.getElementById("output").innerHTML = html;
+}
+
+loadData();
+</script>
 
 </body>
 </html>

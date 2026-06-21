@@ -21,8 +21,9 @@
             align-items: center;
             font-family: "Inter", sans-serif;
             background: linear-gradient(135deg, #0f172a, #1e293b, #3b82f6);
-            overflow: hidden;
             flex-direction: column;
+            overflow: auto;
+            padding: 40px;
         }
 
         .container {
@@ -32,57 +33,20 @@
             backdrop-filter: blur(20px);
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow:
-                0 20px 40px rgba(0, 0, 0, 0.25),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+            width: 90%;
+            max-width: 800px;
         }
 
         h1 {
-            font-size: clamp(2.5rem, 6vw, 5rem);
-            font-weight: 800;
-            color: #ffffff;
-            letter-spacing: -2px;
-            margin-bottom: 1rem;
-            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            color: white;
+            margin-bottom: 10px;
         }
 
-        p {
-            color: rgba(255,255,255,0.85);
-            font-size: 1.1rem;
-            max-width: 600px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-
-        .glow {
-            position: absolute;
-            width: 400px;
-            height: 400px;
-            background: rgba(59, 130, 246, 0.4);
-            filter: blur(120px);
-            border-radius: 50%;
-            z-index: -1;
-        }
-
-        .glow.one {
-            top: -100px;
-            left: -100px;
-        }
-
-        .glow.two {
-            bottom: -100px;
-            right: -100px;
-            background: rgba(168, 85, 247, 0.4);
-        }
-
-        /* NEW UI */
-        .form-box {
-            margin-top: 25px;
-        }
-
-        input {
+        input, textarea {
+            width: 100%;
             padding: 10px;
-            margin: 5px;
+            margin: 5px 0;
             border-radius: 8px;
             border: none;
             outline: none;
@@ -95,44 +59,44 @@
             cursor: pointer;
             background: #3b82f6;
             color: white;
+            margin-top: 10px;
         }
 
-        #output {
-            margin-top: 20px;
+        .card {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 10px;
             color: white;
             text-align: left;
-            max-height: 200px;
-            overflow-y: auto;
+        }
+
+        a {
+            color: #60a5fa;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="glow one"></div>
-    <div class="glow two"></div>
+<div class="container">
+    <h1>Training Data Manager</h1>
 
-    <div class="container">
-        <h1>Welcome to AI from Github Web</h1>
-        <p>
-            Explore the future of AI-powered development with a modern,
-            responsive, and elegant web experience.
-        </p>
+    <input id="title" placeholder="Title">
+    <textarea id="desc" placeholder="Description"></textarea>
+    <input id="tech" placeholder="Technology">
+    <input id="link" placeholder="Link">
 
-        <!-- NEW FORM -->
-        <div class="form-box">
-            <input id="name" placeholder="Your name">
-            <input id="message" placeholder="Message">
-            <button onclick="saveData()">Send</button>
-        </div>
+    <button onclick="addData()">Add Data</button>
 
-        <div id="output"></div>
-    </div>
+    <h2 style="color:white;margin-top:20px;">Records</h2>
+    <div id="output"></div>
+</div>
 
 <script>
-/* -----------------------------
+/* =========================
    SUPABASE CONNECTION
-------------------------------*/
+========================= */
 const SUPABASE_URL = "https://ykcbdmdqzeonodemcavc.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_yhzQvFqLaMw861azeWeBSQ_iDUy70Jg";
 
@@ -141,34 +105,47 @@ const supabaseClient = supabase.createClient(
     SUPABASE_ANON_KEY
 );
 
-/* -----------------------------
-   SAVE DATA TO SUPABASE
-------------------------------*/
-async function saveData() {
-    const name = document.getElementById("name").value;
-    const message = document.getElementById("message").value;
+/* =========================
+   INSERT DATA
+========================= */
+async function addData() {
+
+    const title = document.getElementById("title").value;
+    const desc = document.getElementById("desc").value;
+    const tech = document.getElementById("tech").value;
+    const link = document.getElementById("link").value;
 
     const { error } = await supabaseClient
-        .from("messages")
-        .insert([{ name, message }]);
+        .from("trainingdata")
+        .insert([
+            {
+                title,
+                desc,
+                tech,
+                link
+            }
+        ]);
 
     if (error) {
-        alert("Error: " + error.message);
+        alert(error.message);
         return;
     }
 
-    document.getElementById("name").value = "";
-    document.getElementById("message").value = "";
+    document.getElementById("title").value = "";
+    document.getElementById("desc").value = "";
+    document.getElementById("tech").value = "";
+    document.getElementById("link").value = "";
 
     loadData();
 }
 
-/* -----------------------------
-   LOAD DATA FROM SUPABASE
-------------------------------*/
+/* =========================
+   FETCH DATA
+========================= */
 async function loadData() {
+
     const { data, error } = await supabaseClient
-        .from("messages")
+        .from("trainingdata")
         .select("*")
         .order("id", { ascending: false });
 
@@ -177,10 +154,17 @@ async function loadData() {
         return;
     }
 
-    let html = "<h3>Messages</h3>";
+    let html = "";
 
     data.forEach(item => {
-        html += `<p><b>${item.name}</b>: ${item.message}</p>`;
+        html += `
+            <div class="card">
+                <h3>${item.title}</h3>
+                <p>${item.desc || ""}</p>
+                <p><b>Tech:</b> ${item.tech || ""}</p>
+                ${item.link ? `<a href="${item.link}" target="_blank">Open Link</a>` : ""}
+            </div>
+        `;
     });
 
     document.getElementById("output").innerHTML = html;

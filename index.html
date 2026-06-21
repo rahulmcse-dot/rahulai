@@ -1,101 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to AI</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Training Data Manager</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<style>
+    body {
+        font-family: Arial;
+        background: #0f172a;
+        color: white;
+        display: flex;
+        justify-content: center;
+        padding: 40px;
+    }
 
-        body {
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: "Inter", sans-serif;
-            background: linear-gradient(135deg, #0f172a, #1e293b, #3b82f6);
-            flex-direction: column;
-            overflow: auto;
-            padding: 40px;
-        }
+    .box {
+        width: 600px;
+        background: rgba(255,255,255,0.08);
+        padding: 20px;
+        border-radius: 12px;
+    }
 
-        .container {
-            text-align: center;
-            padding: 3rem;
-            border-radius: 24px;
-            backdrop-filter: blur(20px);
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
-            width: 90%;
-            max-width: 800px;
-        }
+    input, textarea {
+        width: 100%;
+        margin: 8px 0;
+        padding: 10px;
+        border-radius: 6px;
+        border: none;
+    }
 
-        h1 {
-            color: white;
-            margin-bottom: 10px;
-        }
+    button {
+        padding: 10px;
+        width: 100%;
+        background: #3b82f6;
+        color: white;
+        border: none;
+        cursor: pointer;
+        margin-top: 10px;
+        border-radius: 6px;
+    }
 
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 8px;
-            border: none;
-            outline: none;
-        }
+    .card {
+        margin-top: 10px;
+        padding: 10px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 8px;
+    }
 
-        button {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            background: #3b82f6;
-            color: white;
-            margin-top: 10px;
-        }
-
-        .card {
-            background: rgba(255,255,255,0.1);
-            padding: 15px;
-            margin-top: 10px;
-            border-radius: 10px;
-            color: white;
-            text-align: left;
-        }
-
-        a {
-            color: #60a5fa;
-        }
-    </style>
+    a { color: #60a5fa; }
+</style>
 </head>
 
 <body>
 
-<div class="container">
-    <h1>Training Data Manager</h1>
+<div class="box">
+    <h2>Training Data Manager</h2>
 
-    <input id="title" placeholder="Title">
+    <input id="title" placeholder="Title"/>
     <textarea id="desc" placeholder="Description"></textarea>
-    <input id="tech" placeholder="Technology">
-    <input id="link" placeholder="Link">
+    <input id="tech" placeholder="Technology"/>
+    <input id="link" placeholder="Link"/>
 
     <button onclick="addData()">Add Data</button>
 
-    <h2 style="color:white;margin-top:20px;">Records</h2>
+    <h3>Records</h3>
     <div id="output"></div>
 </div>
 
 <script>
 /* =========================
-   SUPABASE CONNECTION
+   SUPABASE CONFIG
 ========================= */
 const SUPABASE_URL = "https://ykcbdmdqzeonodemcavc.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_yhzQvFqLaMw861azeWeBSQ_iDUy70Jg";
@@ -119,15 +96,16 @@ async function addData() {
         .from("trainingdata")
         .insert([
             {
-                title,
-                desc,
-                tech,
-                link
+                title: title,
+                desc: desc,
+                tech: tech,
+                link: link
             }
         ]);
 
     if (error) {
-        alert(error.message);
+        alert("Insert Error: " + error.message);
+        console.log(error);
         return;
     }
 
@@ -150,19 +128,19 @@ async function loadData() {
         .order("id", { ascending: false });
 
     if (error) {
-        console.log(error);
+        console.log("Fetch Error:", error);
         return;
     }
 
     let html = "";
 
-    data.forEach(item => {
+    data.forEach(row => {
         html += `
             <div class="card">
-                <h3>${item.title}</h3>
-                <p>${item.desc || ""}</p>
-                <p><b>Tech:</b> ${item.tech || ""}</p>
-                ${item.link ? `<a href="${item.link}" target="_blank">Open Link</a>` : ""}
+                <h4>${row.title}</h4>
+                <p>${row.desc || ""}</p>
+                <p><b>Tech:</b> ${row.tech || ""}</p>
+                ${row.link ? `<a href="${row.link}" target="_blank">Open Link</a>` : ""}
             </div>
         `;
     });

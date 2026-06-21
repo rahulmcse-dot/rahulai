@@ -3,79 +3,114 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Training Data Manager</title>
+<title>Tech Showcase</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
     body {
-        font-family: Arial;
+        margin: 0;
+        font-family: "Inter", sans-serif;
         background: #0f172a;
         color: white;
-        display: flex;
-        justify-content: center;
-        padding: 40px;
     }
 
-    .box {
-        width: 600px;
-        background: rgba(255,255,255,0.08);
+    /* HERO SECTION */
+    .hero {
+        text-align: center;
+        padding: 80px 20px;
+        background: linear-gradient(135deg, #1e293b, #0f172a);
+    }
+
+    .hero h1 {
+        font-size: 48px;
+        margin-bottom: 10px;
+    }
+
+    .hero p {
+        opacity: 0.8;
+        font-size: 18px;
+    }
+
+    /* GRID */
+    .container {
+        max-width: 1100px;
+        margin: auto;
+        padding: 40px 20px;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    /* CARD */
+    .card {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
         padding: 20px;
         border-radius: 12px;
+        transition: 0.3s;
     }
 
-    input, textarea {
-        width: 100%;
-        margin: 8px 0;
-        padding: 10px;
-        border-radius: 6px;
-        border: none;
+    .card:hover {
+        transform: translateY(-5px);
+        background: rgba(255,255,255,0.08);
     }
 
-    button {
-        padding: 10px;
-        width: 100%;
-        background: #3b82f6;
-        color: white;
-        border: none;
-        cursor: pointer;
+    .card h3 {
+        margin: 0 0 10px 0;
+        color: #60a5fa;
+    }
+
+    .tag {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        background: #1e293b;
+        font-size: 12px;
         margin-top: 10px;
-        border-radius: 6px;
     }
 
-    .card {
+    a {
+        color: #38bdf8;
+        text-decoration: none;
+        display: inline-block;
         margin-top: 10px;
-        padding: 10px;
-        background: rgba(255,255,255,0.1);
-        border-radius: 8px;
     }
 
-    a { color: #60a5fa; }
+    footer {
+        text-align: center;
+        padding: 40px;
+        opacity: 0.6;
+    }
 </style>
 </head>
 
 <body>
 
-<div class="box">
-    <h2>Training Data Manager</h2>
-
-    <input id="title" placeholder="Title"/>
-    <textarea id="desc" placeholder="Description"></textarea>
-    <input id="tech" placeholder="Technology"/>
-    <input id="link" placeholder="Link"/>
-
-    <button onclick="addData()">Add Data</button>
-
-    <h3>Records</h3>
-    <div id="output"></div>
+<!-- HERO -->
+<div class="hero">
+    <h1>Tech Knowledge Hub</h1>
+    <p>Explore curated technologies, tools, and learning resources</p>
 </div>
+
+<!-- CONTENT -->
+<div class="container">
+    <div id="grid" class="grid"></div>
+</div>
+
+<footer>
+    Built with Supabase + GitHub Pages
+</footer>
 
 <script>
 /* =========================
    SUPABASE CONFIG
 ========================= */
 const SUPABASE_URL = "https://ykcbdmdqzeonodemcavc.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_yhzQvFqLaMw861azeWeBSQ_iDUy70Jg";
+const SUPABASE_ANON_KEY = "PASTE_YOUR_ANON_KEY_HERE";
 
 const supabaseClient = supabase.createClient(
     SUPABASE_URL,
@@ -83,42 +118,7 @@ const supabaseClient = supabase.createClient(
 );
 
 /* =========================
-   INSERT DATA
-========================= */
-async function addData() {
-
-    const title = document.getElementById("title").value;
-    const desc = document.getElementById("desc").value;
-    const tech = document.getElementById("tech").value;
-    const link = document.getElementById("link").value;
-
-    const { error } = await supabaseClient
-        .from("trainingdata")
-        .insert([
-            {
-                title: title,
-                desc: desc,
-                tech: tech,
-                link: link
-            }
-        ]);
-
-    if (error) {
-        alert("Insert Error: " + error.message);
-        console.log(error);
-        return;
-    }
-
-    document.getElementById("title").value = "";
-    document.getElementById("desc").value = "";
-    document.getElementById("tech").value = "";
-    document.getElementById("link").value = "";
-
-    loadData();
-}
-
-/* =========================
-   FETCH DATA
+   LOAD DATA
 ========================= */
 async function loadData() {
 
@@ -128,24 +128,25 @@ async function loadData() {
         .order("id", { ascending: false });
 
     if (error) {
-        console.log("Fetch Error:", error);
+        console.error(error);
         return;
     }
 
-    let html = "";
+    const grid = document.getElementById("grid");
 
-    data.forEach(row => {
-        html += `
-            <div class="card">
-                <h4>${row.title}</h4>
-                <p>${row.desc || ""}</p>
-                <p><b>Tech:</b> ${row.tech || ""}</p>
-                ${row.link ? `<a href="${row.link}" target="_blank">Open Link</a>` : ""}
-            </div>
-        `;
-    });
+    grid.innerHTML = data.map(item => `
+        <div class="card">
+            <h3>${item.title || ""}</h3>
+            <p>${item.desc || ""}</p>
 
-    document.getElementById("output").innerHTML = html;
+            ${item.tech ? `<div class="tag">${item.tech}</div>` : ""}
+
+            ${item.link ? `
+                <br/>
+                <a href="${item.link}" target="_blank">Learn More →</a>
+            ` : ""}
+        </div>
+    `).join("");
 }
 
 loadData();

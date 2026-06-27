@@ -1,1 +1,152 @@
+/* RESET */
 
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial, Helvetica, sans-serif;
+    background:#0f172a;
+    color:white;
+    min-height:100vh;
+}
+
+/* HEADER */
+
+header{
+    background:#111827;
+    border-bottom:1px solid rgba(255,255,255,.1);
+}
+
+.navbar{
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.logo{
+    font-size:24px;
+    font-weight:bold;
+}
+
+.nav-links a{
+    color:white;
+    text-decoration:none;
+    margin-left:20px;
+}
+
+.nav-links a:hover{
+    color:#60a5fa;
+}
+
+/* HERO */
+
+.hero{
+    text-align:center;
+    padding:80px 20px;
+    background:
+    linear-gradient(
+        135deg,
+        #1e293b,
+        #0f172a
+    );
+}
+
+.hero h1{
+    font-size:50px;
+    margin-bottom:15px;
+}
+
+.hero p{
+    opacity:.8;
+    font-size:18px;
+}
+
+/* CONTENT */
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:40px 20px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:
+    repeat(auto-fit,minmax(300px,1fr));
+    gap:20px;
+}
+
+/* CARD */
+
+.card{
+    background:
+    rgba(255,255,255,.05);
+
+    border:
+    1px solid rgba(255,255,255,.1);
+
+    border-radius:12px;
+
+    padding:20px;
+
+    transition:.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+}
+
+.card h3{
+    color:#60a5fa;
+    margin-bottom:10px;
+}
+
+.card p{
+    line-height:1.6;
+    margin-bottom:15px;
+}
+
+/* TAG */
+
+.tag{
+    display:inline-block;
+    background:#1e293b;
+    padding:5px 12px;
+    border-radius:20px;
+    font-size:12px;
+    margin-bottom:15px;
+}
+
+/* LINK */
+
+.card a{
+    display:inline-block;
+    margin-top:15px;
+    color:#38bdf8;
+    text-decoration:none;
+}
+
+.card a:hover{
+    text-decoration:underline;
+}
+
+/* FOOTER */
+
+footer{
+    text-align:center;
+    padding:30px;
+    opacity:.6;
+}
+
+/* ERROR */
+
+.error{
+    text-align:center;
+    padding:40px;
+}

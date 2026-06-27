@@ -1,218 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
+<script type="module" src="js/config.js"></script>
 
-<head>
+<script type="module">
 
-    <meta charset="UTF-8">
+    window.addEventListener("load", () => {
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+        const waitForConfig = setInterval(() => {
 
-    <title>Tech Knowledge Hub</title>
+            if (
+                window.firebaseAuth &&
+                window.supabaseClient
+            ) {
 
-    <!-- Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <!-- Shared CSS -->
-    <link rel="stylesheet" href="css/style.css">
-
-</head>
-
-<body>
-
-    <!-- ==========================
-         HEADER
-    ========================== -->
-
-    <header>
-
-        <div class="navbar">
-
-            <div class="logo">
-                Tech Hub
-            </div>
-
-            <div class="nav-links">
-
-                <a href="index.html">Home</a>
-                <a href="about.html">About</a>
-                <a href="contact.html">Contact</a>
-
-            </div>
-
-            <!-- Login Area -->
-
-            <div id="auth-area">
-
-                <button id="loginBtn">
-                    Login with Google
-                </button>
-
-            </div>
-
-        </div>
-
-    </header>
-
-    <!-- ==========================
-         HERO
-    ========================== -->
-
-    <section class="hero">
-
-        <h1>
-            Tech Knowledge Hub
-        </h1>
-
-        <p>
-            Explore cloud technologies,
-            training resources,
-            tutorials and learning paths.
-        </p>
-
-    </section>
-
-    <!-- ==========================
-         COURSES
-    ========================== -->
-
-    <main class="container">
-
-        <div id="grid" class="grid">
-
-            <!-- Loaded from Supabase -->
-
-        </div>
-
-    </main>
-
-    <!-- ==========================
-         FOOTER
-    ========================== -->
-
-    <footer>
-
-        Built with GitHub Pages,
-        Firebase Authentication
-        and Supabase
-
-    </footer>
-
-    <!-- ==========================
-         CONFIG
-    ========================== -->
-
-    <script type="module" src="js/config.js"></script>
-
-    <!-- ==========================
-         PAGE LOGIC
-    ========================== -->
-
-    <script type="module">
-
-        import {
-            GoogleAuthProvider,
-            signInWithPopup,
-            onAuthStateChanged
-        }
-        from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
-
-        const waitForFirebase = setInterval(() => {
-
-            if (window.firebaseAuth) {
-
-                clearInterval(waitForFirebase);
+                clearInterval(waitForConfig);
 
                 initializeAuth();
 
+                if (typeof loadData === "function") {
+                    loadData();
+                }
+
             }
 
-        }, 500);
+        }, 200);
 
-        function initializeAuth() {
+    });
 
-            const auth = window.firebaseAuth;
+</script>
 
-            const provider =
-                new GoogleAuthProvider();
-
-            const loginBtn =
-                document.getElementById(
-                    "loginBtn"
-                );
-
-            loginBtn.addEventListener(
-                "click",
-                async () => {
-
-                    try {
-
-                        await signInWithPopup(
-                            auth,
-                            provider
-                        );
-
-                    }
-                    catch (err) {
-
-                        console.error(err);
-
-                    }
-
-                }
-            );
-
-            onAuthStateChanged(
-                auth,
-                user => {
-
-                    if (!user) return;
-
-                    document
-                    .getElementById(
-                        "auth-area"
-                    )
-                    .innerHTML =
-
-                    `
-                    <div
-                      style="
-                      display:flex;
-                      align-items:center;
-                      gap:10px;"
-                    >
-
-                        <img
-                            src="${user.photoURL}"
-                            style="
-                                width:40px;
-                                height:40px;
-                                border-radius:50%;
-                            "
-                        >
-
-                        <span>
-                            ${user.displayName}
-                        </span>
-
-                    </div>
-                    `;
-
-                    console.log(
-                        "Logged In:",
-                        user.displayName
-                    );
-
-                }
-            );
-        }
-
-    </script>
-
-    <!-- Existing Logic -->
-
-    <script src="js/main.js"></script>
-
-</body>
-
-</html>
+<script src="js/main.js"></script>

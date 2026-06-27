@@ -1,30 +1,103 @@
-<script type="module" src="js/config.js"></script>
+<!DOCTYPE html>
+<html lang="en">
 
-<script type="module">
+<head>
 
-    window.addEventListener("load", () => {
+    <meta charset="UTF-8">
 
-        const waitForConfig = setInterval(() => {
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-            if (
-                window.firebaseAuth &&
-                window.supabaseClient
-            ) {
+    <title>Tech Knowledge Hub</title>
 
-                clearInterval(waitForConfig);
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-                initializeAuth();
+    <!-- Shared CSS -->
+    <link rel="stylesheet" href="css/style.css">
 
-                if (typeof loadData === "function") {
-                    loadData();
-                }
+</head>
 
-            }
+<body>
 
-        }, 200);
+    <!-- HEADER -->
 
-    });
+    <header>
 
-</script>
+        <div class="navbar">
 
-<script src="js/main.js"></script>
+            <div class="logo">
+                Tech Hub
+            </div>
+
+            <div class="nav-links">
+
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+
+            </div>
+
+            <!-- Firebase Login Area -->
+
+            <div id="auth-area">
+
+                <button id="loginBtn">
+                    Login with Google
+                </button>
+
+            </div>
+
+        </div>
+
+    </header>
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+        <h1>
+            Tech Knowledge Hub
+        </h1>
+
+        <p>
+            Explore cloud technologies,
+            training resources,
+            tutorials and learning paths.
+        </p>
+
+    </section>
+
+    <!-- COURSE GRID -->
+
+    <main class="container">
+
+        <div id="grid" class="grid">
+
+            <!-- Courses loaded from Supabase -->
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        Built with GitHub Pages,
+        Firebase Authentication
+        and Supabase
+
+    </footer>
+
+    <!-- Firebase + Supabase Configuration -->
+
+    <script type="module" src="js/config.js"></script>
+
+    <!-- Course Loading Logic -->
+
+    <script src="js/main.js" defer></script>
+
+</body>
+
+</html>

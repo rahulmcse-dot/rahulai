@@ -1,156 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Tech Showcase</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta charset="UTF-8">
 
-<style>
-    body {
-        margin: 0;
-        font-family: "Inter", sans-serif;
-        background: #0f172a;
-        color: white;
-    }
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    /* HERO SECTION */
-    .hero {
-        text-align: center;
-        padding: 80px 20px;
-        background: linear-gradient(135deg, #1e293b, #0f172a);
-    }
+    <title>Tech Knowledge Hub</title>
 
-    .hero h1 {
-        font-size: 48px;
-        margin-bottom: 10px;
-    }
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    .hero p {
-        opacity: 0.8;
-        font-size: 18px;
-    }
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
 
-    /* GRID */
-    .container {
-        max-width: 1100px;
-        margin: auto;
-        padding: 40px 20px;
-    }
-
-    .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 20px;
-    }
-
-    /* CARD */
-    .card {
-        background: rgba(255,255,255,0.05);
-        border: 1px solid rgba(255,255,255,0.1);
-        padding: 20px;
-        border-radius: 12px;
-        transition: 0.3s;
-    }
-
-    .card:hover {
-        transform: translateY(-5px);
-        background: rgba(255,255,255,0.08);
-    }
-
-    .card h3 {
-        margin: 0 0 10px 0;
-        color: #60a5fa;
-    }
-
-    .tag {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 20px;
-        background: #1e293b;
-        font-size: 12px;
-        margin-top: 10px;
-    }
-
-    a {
-        color: #38bdf8;
-        text-decoration: none;
-        display: inline-block;
-        margin-top: 10px;
-    }
-
-    footer {
-        text-align: center;
-        padding: 40px;
-        opacity: 0.6;
-    }
-</style>
 </head>
 
 <body>
 
-<!-- HERO -->
-<div class="hero">
-    <h1>Tech Knowledge Hub</h1>
-    <p>Explore curated technologies, tools, and learning resources</p>
-</div>
+    <!-- HEADER -->
 
-<!-- CONTENT -->
-<div class="container">
-    <div id="grid" class="grid"></div>
-</div>
+    <header>
 
-<footer>
-    Built with Supabase + GitHub Pages
-</footer>
+        <div class="navbar">
 
-<script>
-/* =========================
-   SUPABASE CONFIG
-========================= */
-const SUPABASE_URL = "https://ykcbdmdqzeonodemcavc.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_yhzQvFqLaMw861azeWeBSQ_iDUy70Jg";
+            <div class="logo">
+                Tech Hub
+            </div>
 
-const supabaseClient = supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-);
+            <div class="nav-links">
 
-/* =========================
-   LOAD DATA
-========================= */
-async function loadData() {
+                <a href="index.html">
+                    Home
+                </a>
 
-    const { data, error } = await supabaseClient
-        .from("trainingdata")
-        .select("*")
-        .order("id", { ascending: false });
+                <a href="about.html">
+                    About
+                </a>
 
-    if (error) {
-        console.error(error);
-        return;
-    }
+                <a href="contact.html">
+                    Contact
+                </a>
 
-    const grid = document.getElementById("grid");
+            </div>
 
-    grid.innerHTML = data.map(item => `
-        <div class="card">
-            <h3>${item.title || ""}</h3>
-            <p>${item.desc || ""}</p>
-
-            ${item.tech ? `<div class="tag">${item.tech}</div>` : ""}
-
-            ${item.link ? `
-                <br/>
-                <a href="${item.link}" target="_blank">Learn More →</a>
-            ` : ""}
         </div>
-    `).join("");
-}
 
-loadData();
-</script>
+    </header>
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+        <h1>
+            Tech Knowledge Hub
+        </h1>
+
+        <p>
+            Explore cloud technologies,
+            training resources,
+            tutorials and learning paths.
+        </p>
+
+    </section>
+
+    <!-- CONTENT -->
+
+    <main class="container">
+
+        <div
+            id="grid"
+            class="grid"
+        ></div>
+
+    </main>
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        Built with GitHub Pages & Supabase
+
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script src="js/main.js"></script>
 
 </body>
+
 </html>

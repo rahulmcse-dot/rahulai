@@ -1,7 +1,8 @@
 import {
     GoogleAuthProvider,
     signInWithPopup,
-    onAuthStateChanged
+    onAuthStateChanged,
+    signOut
 }
 from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
 
@@ -21,8 +22,7 @@ function initializeAuth() {
 
     const auth = window.firebaseAuth;
 
-    const provider =
-        new GoogleAuthProvider();
+    const provider = new GoogleAuthProvider();
 
     const loginBtn =
         document.getElementById("loginBtn");
@@ -35,45 +35,123 @@ function initializeAuth() {
 
                 try {
 
-                    const result =
-                        await signInWithPopup(
-                            auth,
-                            provider
-                        );
-
-                    console.log(
-                        "Logged In:",
-                        result.user.displayName
+                    await signInWithPopup(
+                        auth,
+                        provider
                     );
 
                 }
                 catch (error) {
 
-                    console.error(error);
+                    console.error(
+                        "Login Error:",
+                        error
+                    );
 
                 }
 
             }
         );
+
     }
 
     onAuthStateChanged(
         auth,
-        user => {
+        (user) => {
 
-            if (!user) return;
+            const authArea =
+                document.getElementById(
+                    "auth-area"
+                );
+
+            if (!user) {
+
+                authArea.innerHTML = `
+                    <button id="loginBtn">
+                        Login with Google
+                    </button>
+                `;
+
+                document
+                    .getElementById("loginBtn")
+                    .addEventListener(
+                        "click",
+                        async () => {
+
+                            try {
+
+                                await signInWithPopup(
+                                    auth,
+                                    provider
+                                );
+
+                            }
+                            catch (error) {
+
+                                console.error(
+                                    error
+                                );
+
+                            }
+
+                        }
+                    );
+
+                return;
+            }
+
+            authArea.innerHTML = `
+                <div style="
+                    display:flex;
+                    align-items:center;
+                    gap:10px;
+                ">
+
+                    <img
+                        src="${user.photoURL}"
+                        width="40"
+                        height="40"
+                        style="
+                            border-radius:50%;
+                        "
+                    >
+
+                    <span>
+                        ${user.displayName}
+                    </span>
+
+                    <button id="logoutBtn">
+                        Logout
+                    </button>
+
+                </div>
+            `;
 
             document
-            .getElementById("auth-area")
-            .innerHTML = `
-                <img
-                    src="${user.photoURL}"
-                    width="40"
-                    height="40"
-                    style="border-radius:50%;"
-                >
-                ${user.displayName}
-            `;
+                .getElementById(
+                    "logoutBtn"
+                )
+                .addEventListener(
+                    "click",
+                    async () => {
+
+                        try {
+
+                            await signOut(auth);
+
+                            location.reload();
+
+                        }
+                        catch (error) {
+
+                            console.error(
+                                error
+                            );
+
+                        }
+
+                    }
+                );
         }
     );
 }

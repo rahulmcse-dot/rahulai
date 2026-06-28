@@ -1,278 +1,436 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard</title>
 
-    <title>Admin Dashboard</title>
+<link rel="stylesheet" href="css/style.css">
 
-    <link rel="stylesheet"
-          href="css/style.css">
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 </head>
 
 <body>
 
-    <!-- HEADER -->
+<header>
 
-    <header>
+    <div class="navbar">
 
-        <div class="navbar">
+        <div class="logo">
+            Tech Hub
+        </div>
 
-            <div class="logo">
-                Tech Hub
-            </div>
+        <div class="nav-links">
 
-            <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact</a>
 
-                <a href="index.html">Home</a>
-
-                <a href="about.html">About</a>
-
-                <a href="contact.html">Contact</a>
-
-                <a href="admin.html"
-                   id="adminLink">
-                    Admin
-                </a>
-
-            </div>
-
-            <div id="auth-area"></div>
+            <a href="admin.html"
+               id="adminLink">
+                Admin
+            </a>
 
         </div>
 
-    </header>
+        <div id="auth-area"></div>
 
-    <!-- MAIN -->
+    </div>
 
-    <main class="container">
+</header>
 
-        <h1>
-            Admin Dashboard
-        </h1>
+<main class="container">
 
-        <div id="adminStatus">
+    <h1>Admin Dashboard</h1>
 
-            Checking access...
+    <div id="adminStatus">
 
-        </div>
+        Checking access...
 
-        <br>
+    </div>
 
-        <button id="addCourseBtn">
+    <br>
 
-            Add New Course
+    <button id="addCourseBtn">
 
+        Add New Course
+
+    </button>
+
+    <br><br>
+
+    <div id="courseForm"
+         style="display:none;">
+
+        <input
+            type="text"
+            id="title"
+            placeholder="Title"
+        >
+
+        <br><br>
+
+        <textarea
+            id="desc"
+            placeholder="Description"
+        ></textarea>
+
+        <br><br>
+
+        <input
+            type="text"
+            id="tech"
+            placeholder="Technology"
+        >
+
+        <br><br>
+
+        <input
+            type="text"
+            id="link"
+            placeholder="Course Link"
+        >
+
+        <br><br>
+
+        <button id="saveCourseBtn">
+            Save Course
         </button>
 
         <hr>
 
-        <div id="courseList">
+    </div>
 
-            Loading courses...
+    <div id="courseList">
 
-        </div>
+        Loading courses...
 
-    </main>
+    </div>
 
-    <!-- FOOTER -->
+</main>
 
-    <footer>
+<footer>
 
-        Built with GitHub Pages,
-        Firebase Authentication
-        and Supabase
+Built with GitHub Pages,
+Firebase Authentication
+and Supabase
 
-    </footer>
+</footer>
 
-    <!-- CONFIG -->
+<script type="module"
+        src="js/config.js"></script>
 
-    <script type="module"
-            src="js/config.js"></script>
+<script type="module"
+        src="js/auth.js"></script>
 
-    <script type="module"
-            src="js/auth.js"></script>
+<script type="module">
 
-    <!-- ADMIN LOGIC -->
+import {
+    onAuthStateChanged
+}
+from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
 
-    <script type="module">
+const ADMIN_EMAIL =
+    "rahulmcse@gmail.com";
 
-        import {
-            onAuthStateChanged
-        }
-        from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+const waitForFirebase =
+setInterval(() => {
 
-        const ADMIN_EMAIL =
-            "rahulmcse@gmail.com";
+    if (
+        window.firebaseAuth &&
+        window.supabaseClient
+    ) {
 
-        const waitForFirebase =
-            setInterval(() => {
+        clearInterval(
+            waitForFirebase
+        );
 
-                if (
-                    window.firebaseAuth &&
-                    window.supabaseClient
-                ) {
+        initializeAdmin();
 
-                    clearInterval(
-                        waitForFirebase
-                    );
+    }
 
-                    checkAdmin();
+}, 200);
 
-                }
+function initializeAdmin() {
 
-            }, 200);
+    onAuthStateChanged(
+        window.firebaseAuth,
+        (user) => {
 
-        function checkAdmin() {
+            if (!user) {
 
-            onAuthStateChanged(
-                window.firebaseAuth,
-                (user) => {
-
-                    if (!user) {
-
-                        window.location.href =
-                            "index.html";
-
-                        return;
-
-                    }
-
-                    if (
-                        user.email !==
-                        ADMIN_EMAIL
-                    ) {
-
-                        window.location.href =
-                            "index.html";
-
-                        return;
-
-                    }
-
-                    document.getElementById(
-                        "adminStatus"
-                    ).innerHTML =
-
-                    `
-                    <h2>
-                        Welcome Admin
-                    </h2>
-
-                    <p>
-                        ${user.displayName}
-                    </p>
-                    `;
-
-                    loadCourses();
-
-                }
-            );
-
-        }
-
-        async function loadCourses() {
-
-            const courseList =
-                document.getElementById(
-                    "courseList"
-                );
-
-            courseList.innerHTML =
-                "Loading courses...";
-
-            const {
-                data,
-                error
-            } =
-            await window.supabaseClient
-                .from("trainingdata")
-                .select("*")
-                .order("id", {
-                    ascending: false
-                });
-
-            if (error) {
-
-                console.error(error);
-
-                courseList.innerHTML =
-                    "Error loading courses";
+                window.location.href =
+                    "index.html";
 
                 return;
 
             }
 
             if (
-                !data ||
-                data.length === 0
+                user.email !==
+                ADMIN_EMAIL
             ) {
 
-                courseList.innerHTML =
-                    "No courses found";
+                window.location.href =
+                    "index.html";
 
                 return;
 
             }
 
-            courseList.innerHTML = "";
+            document.getElementById(
+                "adminStatus"
+            ).innerHTML =
 
-            data.forEach(course => {
+            `
+            <h2>Welcome Admin</h2>
+            <p>${user.displayName}</p>
+            `;
 
-                courseList.innerHTML += `
-
-                <div class="card">
-
-                    <h3>
-                        ${course.title || ""}
-                    </h3>
-
-                    <p>
-                        ${course.desc || ""}
-                    </p>
-
-                    <div class="tag">
-                        ${course.tech || ""}
-                    </div>
-
-                    <br><br>
-
-                    <a
-                        href="${course.link || "#"}"
-                        target="_blank"
-                    >
-                        Open Link
-                    </a>
-
-                    <br><br>
-
-                    <button>
-                        Edit
-                    </button>
-
-                    <button>
-                        Delete
-                    </button>
-
-                </div>
-
-                <br>
-
-                `;
-
-            });
+            loadCourses();
 
         }
+    );
+}
 
-    </script>
+document
+.getElementById("addCourseBtn")
+.addEventListener(
+    "click",
+    () => {
+
+        document
+        .getElementById(
+            "courseForm"
+        )
+        .style.display =
+        "block";
+
+    }
+);
+
+document
+.getElementById("saveCourseBtn")
+.addEventListener(
+    "click",
+    addCourse
+);
+
+async function addCourse() {
+
+    const title =
+        document.getElementById(
+            "title"
+        ).value;
+
+    const desc =
+        document.getElementById(
+            "desc"
+        ).value;
+
+    const tech =
+        document.getElementById(
+            "tech"
+        ).value;
+
+    const link =
+        document.getElementById(
+            "link"
+        ).value;
+
+    if (!title) {
+
+        alert(
+            "Title is required"
+        );
+
+        return;
+
+    }
+
+    const { error } =
+    await window.supabaseClient
+        .from("trainingdata")
+        .insert([
+            {
+                title,
+                desc,
+                tech,
+                link
+            }
+        ]);
+
+    if (error) {
+
+        console.error(error);
+
+        return;
+
+    }
+
+    loadCourses();
+
+}
+
+async function loadCourses() {
+
+    const {
+        data,
+        error
+    } =
+    await window.supabaseClient
+        .from("trainingdata")
+        .select("*")
+        .order(
+            "id",
+            {
+                ascending:false
+            }
+        );
+
+    if (error) {
+
+        console.error(error);
+
+        return;
+
+    }
+
+    const courseList =
+        document.getElementById(
+            "courseList"
+        );
+
+    courseList.innerHTML = "";
+
+    data.forEach(course => {
+
+        courseList.innerHTML += `
+
+        <div class="card">
+
+            <input
+                id="title-${course.id}"
+                value="${course.title || ""}"
+            >
+
+            <br><br>
+
+            <textarea
+                id="desc-${course.id}"
+            >${course.desc || ""}</textarea>
+
+            <br><br>
+
+            <input
+                id="tech-${course.id}"
+                value="${course.tech || ""}"
+            >
+
+            <br><br>
+
+            <input
+                id="link-${course.id}"
+                value="${course.link || ""}"
+            >
+
+            <br><br>
+
+            <button
+                onclick="saveCourse(${course.id})"
+            >
+                Save
+            </button>
+
+            <button
+                onclick="deleteCourse(${course.id})"
+            >
+                Delete
+            </button>
+
+        </div>
+
+        <br>
+
+        `;
+    });
+
+}
+
+window.saveCourse =
+async function(id) {
+
+    const title =
+        document.getElementById(
+            `title-${id}`
+        ).value;
+
+    const desc =
+        document.getElementById(
+            `desc-${id}`
+        ).value;
+
+    const tech =
+        document.getElementById(
+            `tech-${id}`
+        ).value;
+
+    const link =
+        document.getElementById(
+            `link-${id}`
+        ).value;
+
+    const { error } =
+    await window.supabaseClient
+        .from("trainingdata")
+        .update({
+            title,
+            desc,
+            tech,
+            link
+        })
+        .eq("id", id);
+
+    if (error) {
+
+        console.error(error);
+
+        return;
+
+    }
+
+    alert("Updated");
+
+};
+
+window.deleteCourse =
+async function(id) {
+
+    const { error } =
+    await window.supabaseClient
+        .from("trainingdata")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+
+        console.error(error);
+
+        return;
+
+    }
+
+    loadCourses();
+
+};
+
+</script>
 
 </body>
-
 </html>
+```

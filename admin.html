@@ -2,11 +2,16 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin</title>
 
-    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard</title>
+
+    <link rel="stylesheet"
+          href="css/style.css">
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -14,114 +19,260 @@
 
 <body>
 
-<header>
+    <!-- HEADER -->
 
-    <div class="navbar">
+    <header>
 
-        <div class="logo">
-            Tech Hub
+        <div class="navbar">
+
+            <div class="logo">
+                Tech Hub
+            </div>
+
+            <div class="nav-links">
+
+                <a href="index.html">Home</a>
+
+                <a href="about.html">About</a>
+
+                <a href="contact.html">Contact</a>
+
+                <a href="admin.html"
+                   id="adminLink">
+                    Admin
+                </a>
+
+            </div>
+
+            <div id="auth-area"></div>
+
         </div>
 
-        <div class="nav-links">
+    </header>
 
-            <a href="index.html">Home</a>
-            <a href="about.html">About</a>
-            <a href="contact.html">Contact</a>
-            <a href="admin.html">Admin</a>
+    <!-- MAIN -->
+
+    <main class="container">
+
+        <h1>
+            Admin Dashboard
+        </h1>
+
+        <div id="adminStatus">
+
+            Checking access...
 
         </div>
 
-        <div id="auth-area"></div>
+        <br>
 
-    </div>
+        <button id="addCourseBtn">
 
-</header>
+            Add New Course
 
-<main class="container">
+        </button>
 
-    <h1>Admin Panel</h1>
+        <hr>
 
-    <div id="adminStatus">
-        Checking access...
-    </div>
+        <div id="courseList">
 
-</main>
+            Loading courses...
 
-<footer>
-    Built with GitHub Pages, Firebase Authentication and Supabase
-</footer>
+        </div>
 
-<script type="module" src="js/config.js"></script>
-<script type="module" src="js/auth.js"></script>
+    </main>
 
-<script type="module">
+    <!-- FOOTER -->
 
-import {
-    onAuthStateChanged
-}
-from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+    <footer>
 
-const ADMIN_EMAIL =
-    "rahulmcse@gmail.com";
+        Built with GitHub Pages,
+        Firebase Authentication
+        and Supabase
 
-const waitForFirebase =
-    setInterval(() => {
+    </footer>
 
-        if (window.firebaseAuth) {
+    <!-- CONFIG -->
 
-            clearInterval(waitForFirebase);
+    <script type="module"
+            src="js/config.js"></script>
 
-            checkAdmin();
+    <script type="module"
+            src="js/auth.js"></script>
+
+    <!-- ADMIN LOGIC -->
+
+    <script type="module">
+
+        import {
+            onAuthStateChanged
+        }
+        from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+
+        const ADMIN_EMAIL =
+            "rahulmcse@gmail.com";
+
+        const waitForFirebase =
+            setInterval(() => {
+
+                if (
+                    window.firebaseAuth &&
+                    window.supabaseClient
+                ) {
+
+                    clearInterval(
+                        waitForFirebase
+                    );
+
+                    checkAdmin();
+
+                }
+
+            }, 200);
+
+        function checkAdmin() {
+
+            onAuthStateChanged(
+                window.firebaseAuth,
+                (user) => {
+
+                    if (!user) {
+
+                        window.location.href =
+                            "index.html";
+
+                        return;
+
+                    }
+
+                    if (
+                        user.email !==
+                        ADMIN_EMAIL
+                    ) {
+
+                        window.location.href =
+                            "index.html";
+
+                        return;
+
+                    }
+
+                    document.getElementById(
+                        "adminStatus"
+                    ).innerHTML =
+
+                    `
+                    <h2>
+                        Welcome Admin
+                    </h2>
+
+                    <p>
+                        ${user.displayName}
+                    </p>
+                    `;
+
+                    loadCourses();
+
+                }
+            );
 
         }
 
-    }, 200);
+        async function loadCourses() {
 
-function checkAdmin() {
+            const courseList =
+                document.getElementById(
+                    "courseList"
+                );
 
-    onAuthStateChanged(
-        window.firebaseAuth,
-        (user) => {
+            courseList.innerHTML =
+                "Loading courses...";
 
-            if (!user) {
+            const {
+                data,
+                error
+            } =
+            await window.supabaseClient
+                .from("trainingdata")
+                .select("*")
+                .order("id", {
+                    ascending: false
+                });
 
-                window.location.href =
-                    "index.html";
+            if (error) {
+
+                console.error(error);
+
+                courseList.innerHTML =
+                    "Error loading courses";
 
                 return;
 
             }
 
             if (
-                user.email !== ADMIN_EMAIL
+                !data ||
+                data.length === 0
             ) {
 
-                window.location.href =
-                    "index.html";
+                courseList.innerHTML =
+                    "No courses found";
 
                 return;
 
             }
 
-            document.getElementById(
-                "adminStatus"
-            ).innerHTML =
-            `
-            <h2>
-                Welcome Admin
-            </h2>
+            courseList.innerHTML = "";
 
-            <p>
-                ${user.displayName}
-            </p>
-            `;
+            data.forEach(course => {
+
+                courseList.innerHTML += `
+
+                <div class="card">
+
+                    <h3>
+                        ${course.title || ""}
+                    </h3>
+
+                    <p>
+                        ${course.desc || ""}
+                    </p>
+
+                    <div class="tag">
+                        ${course.tech || ""}
+                    </div>
+
+                    <br><br>
+
+                    <a
+                        href="${course.link || "#"}"
+                        target="_blank"
+                    >
+                        Open Link
+                    </a>
+
+                    <br><br>
+
+                    <button>
+                        Edit
+                    </button>
+
+                    <button>
+                        Delete
+                    </button>
+
+                </div>
+
+                <br>
+
+                `;
+
+            });
 
         }
-    );
 
-}
-
-</script>
+    </script>
 
 </body>
+
 </html>

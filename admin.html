@@ -2,413 +2,126 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Admin - Tech Hub</title>
+    <title>Admin</title>
 
     <link rel="stylesheet" href="css/style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 </head>
 
 <body>
 
-    <!-- Shared Header -->
-    <div id="header-placeholder"></div>
+<header>
 
-    <main class="container">
+    <div class="navbar">
 
-        <h2>Admin Panel</h2>
+        <div class="logo">
+            Tech Hub
+        </div>
 
-        <button id="showAddFormBtn">
-            Add New
-        </button>
+        <div class="nav-links">
 
-        <div id="addForm" style="display:none; margin-top:20px;">
-
-            <input
-                type="text"
-                id="newTitle"
-                placeholder="Title"
-            >
-
-            <br><br>
-
-            <textarea
-                id="newDesc"
-                placeholder="Description"
-            ></textarea>
-
-            <br><br>
-
-            <input
-                type="text"
-                id="newTech"
-                placeholder="Tech"
-            >
-
-            <br><br>
-
-            <input
-                type="text"
-                id="newLink"
-                placeholder="Link"
-            >
-
-            <br><br>
-
-            <button id="saveNewBtn">
-                Save
-            </button>
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact</a>
+            <a href="admin.html">Admin</a>
 
         </div>
 
-        <hr>
+        <div id="auth-area"></div>
 
-        <div id="courseList"></div>
+    </div>
 
-    </main>
+</header>
 
-    <!-- Shared Footer -->
-    <div id="footer-placeholder"></div>
+<main class="container">
 
-    <!-- Config Files -->
-    <script type="module" src="js/config.js"></script>
-    <script type="module" src="js/firebase.js"></script>
-    <script src="js/supabase.js"></script>
+    <h1>Admin Panel</h1>
 
-    <script type="module">
+    <div id="adminStatus">
+        Checking access...
+    </div>
 
-        import {
-            onAuthStateChanged
-        }
-        from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+</main>
 
-        const ADMIN_EMAIL =
-            "rahulmcse@gmail.com";
+<footer>
+    Built with GitHub Pages, Firebase Authentication and Supabase
+</footer>
 
-        async function loadSharedFiles() {
+<script type="module" src="js/config.js"></script>
+<script type="module" src="js/auth.js"></script>
 
-            const header =
-                await fetch("header.html");
+<script type="module">
 
-            document
-                .getElementById(
-                    "header-placeholder"
-                )
-                .innerHTML =
-                await header.text();
+import {
+    onAuthStateChanged
+}
+from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
 
-            const footer =
-                await fetch("footer.html");
+const ADMIN_EMAIL =
+    "rahulmcse@gmail.com";
 
-            document
-                .getElementById(
-                    "footer-placeholder"
-                )
-                .innerHTML =
-                await footer.text();
+const waitForFirebase =
+    setInterval(() => {
+
+        if (window.firebaseAuth) {
+
+            clearInterval(waitForFirebase);
+
+            checkAdmin();
 
         }
 
-        loadSharedFiles();
+    }, 200);
 
-        const waitForFirebase =
-            setInterval(() => {
+function checkAdmin() {
 
-                if (
-                    window.firebaseAuth &&
-                    window.supabaseClient
-                ) {
+    onAuthStateChanged(
+        window.firebaseAuth,
+        (user) => {
 
-                    clearInterval(
-                        waitForFirebase
-                    );
+            if (!user) {
 
-                    initializeAdmin();
-
-                }
-
-            }, 200);
-
-        function initializeAdmin() {
-
-            onAuthStateChanged(
-                window.firebaseAuth,
-                async (user) => {
-
-                    if (!user) {
-
-                        window.location.href =
-                            "index.html";
-
-                        return;
-
-                    }
-
-                    if (
-                        user.email !==
-                        ADMIN_EMAIL
-                    ) {
-
-                        window.location.href =
-                            "index.html";
-
-                        return;
-
-                    }
-
-                    loadCourses();
-
-                }
-            );
-
-        }
-
-        document
-            .getElementById(
-                "showAddFormBtn"
-            )
-            .addEventListener(
-                "click",
-                () => {
-
-                    document
-                        .getElementById(
-                            "addForm"
-                        )
-                        .style.display =
-                        "block";
-
-                }
-            );
-
-        document
-            .getElementById(
-                "saveNewBtn"
-            )
-            .addEventListener(
-                "click",
-                addCourse
-            );
-
-        async function addCourse() {
-
-            const title =
-                document.getElementById(
-                    "newTitle"
-                ).value;
-
-            const desc =
-                document.getElementById(
-                    "newDesc"
-                ).value;
-
-            const tech =
-                document.getElementById(
-                    "newTech"
-                ).value;
-
-            const link =
-                document.getElementById(
-                    "newLink"
-                ).value;
-
-            if (!title) {
-
-                alert(
-                    "Title is required"
-                );
+                window.location.href =
+                    "index.html";
 
                 return;
 
             }
 
-            const { error } =
-                await window.supabaseClient
-                    .from("trainingdata")
-                    .insert([
-                        {
-                            title,
-                            desc,
-                            tech,
-                            link
-                        }
-                    ]);
+            if (
+                user.email !== ADMIN_EMAIL
+            ) {
 
-            if (error) {
-
-                console.error(error);
+                window.location.href =
+                    "index.html";
 
                 return;
 
             }
 
-            loadCourses();
+            document.getElementById(
+                "adminStatus"
+            ).innerHTML =
+            `
+            <h2>
+                Welcome Admin
+            </h2>
 
-            document
-                .getElementById(
-                    "addForm"
-                )
-                .reset?.();
-
-            location.reload();
-
-        }
-
-        async function loadCourses() {
-
-            const {
-                data,
-                error
-            } =
-            await window.supabaseClient
-                .from("trainingdata")
-                .select("*")
-                .order("id");
-
-            if (error) {
-
-                console.error(error);
-
-                return;
-
-            }
-
-            const container =
-                document.getElementById(
-                    "courseList"
-                );
-
-            container.innerHTML = "";
-
-            data.forEach(course => {
-
-                const div =
-                    document.createElement(
-                        "div"
-                    );
-
-                div.innerHTML = `
-
-                    <hr>
-
-                    <input
-                        id="title-${course.id}"
-                        value="${course.title || ""}"
-                    >
-
-                    <br><br>
-
-                    <textarea
-                        id="desc-${course.id}"
-                    >${course.desc || ""}</textarea>
-
-                    <br><br>
-
-                    <input
-                        id="tech-${course.id}"
-                        value="${course.tech || ""}"
-                    >
-
-                    <br><br>
-
-                    <input
-                        id="link-${course.id}"
-                        value="${course.link || ""}"
-                    >
-
-                    <br><br>
-
-                    <button
-                        onclick="saveCourse(${course.id})"
-                    >
-                        Save
-                    </button>
-
-                    <button
-                        onclick="deleteCourse(${course.id})"
-                    >
-                        Delete
-                    </button>
-
-                `;
-
-                container.appendChild(div);
-
-            });
+            <p>
+                ${user.displayName}
+            </p>
+            `;
 
         }
+    );
 
-        window.saveCourse =
-            async function(id) {
+}
 
-                const title =
-                    document.getElementById(
-                        `title-${id}`
-                    ).value;
-
-                const desc =
-                    document.getElementById(
-                        `desc-${id}`
-                    ).value;
-
-                const tech =
-                    document.getElementById(
-                        `tech-${id}`
-                    ).value;
-
-                const link =
-                    document.getElementById(
-                        `link-${id}`
-                    ).value;
-
-                const { error } =
-                    await window.supabaseClient
-                        .from("trainingdata")
-                        .update({
-                            title,
-                            desc,
-                            tech,
-                            link
-                        })
-                        .eq("id", id);
-
-                if (error) {
-
-                    console.error(error);
-
-                    return;
-
-                }
-
-                alert("Updated");
-
-            };
-
-        window.deleteCourse =
-            async function(id) {
-
-                const { error } =
-                    await window.supabaseClient
-                        .from("trainingdata")
-                        .delete()
-                        .eq("id", id);
-
-                if (error) {
-
-                    console.error(error);
-
-                    return;
-
-                }
-
-                loadCourses();
-
-            };
-
-    </script>
+</script>
 
 </body>
 </html>
